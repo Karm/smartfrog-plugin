@@ -1,9 +1,8 @@
 #include "org/smartfrog/components.sf"
+#include "org/smartfrog/sfcore/workflow/components.sf"
 
-sfConfig extends Sequence {
-
-   Empty extends Seqeunce {
-      doNothing "done!";
-   }
-
+sfConfig extends DoNothing {
+    time 10000;
+    message "hello world";
+    sfShouldTerminate true;
 }
