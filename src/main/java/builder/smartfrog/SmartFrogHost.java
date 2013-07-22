@@ -1,10 +1,9 @@
 package builder.smartfrog;
 
+import builder.smartfrog.util.Functions;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
-import hudson.model.Hudson;
-import hudson.model.JDK;
 import hudson.util.ListBoxModel;
 
 import java.util.ArrayList;
@@ -56,6 +55,7 @@ public class SmartFrogHost extends AbstractDescribableImpl<SmartFrogHost> {
     public void setSfAction(SmartFrogAction sfAction){
         this.sfAction = sfAction;
     }
+
     public SmartFrogAction getSfAction() {
         return sfAction;
     }
@@ -129,20 +129,6 @@ public class SmartFrogHost extends AbstractDescribableImpl<SmartFrogHost> {
             ListBoxModel lb = new ListBoxModel();
             for (Platform p : Platform.values()){
                 lb.add(p.toString(), p.toString());
-            }
-            return lb;
-        }
-
-        public ListBoxModel doFillJdkItems(){
-            ListBoxModel lb = new ListBoxModel();
-
-            //TODO: find how to do this neater.
-            new JDK.DescriptorImpl();
-            JDK.DescriptorImpl descriptor = (JDK.DescriptorImpl) Hudson.getInstance().getDescriptorOrDie(JDK.class);
-            JDK[] jdks = descriptor.getInstallations();
-
-            for (JDK jdk : jdks){
-                lb.add(jdk.getName(),jdk.getHome());
             }
             return lb;
         }

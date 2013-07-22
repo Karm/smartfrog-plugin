@@ -21,7 +21,13 @@
  */
 package builder.smartfrog;
 
+import hudson.Extension;
+import hudson.model.AbstractDescribableImpl;
+import hudson.model.Descriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents an installation object - name of the SmartFrog environment installation
@@ -30,39 +36,95 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author Dominik Pospisil
  * @author <a href="http://www.radoslavhusar.com/">Radoslav Husar</a>
  * @author vjuranek
+ * @author jcechace
  */
-public class SmartFrogInstance {
+public class SmartFrogInstance extends AbstractDescribableImpl<SmartFrogInstance> {
 
-   private static final String SUPPORT_SCRIPT = "/hudson-support.sf"; 
-    
-   private String name;
-   private String path;
-   private String support;
+    public static final String SUPPORT_SCRIPT = "hudson-support.sf";
 
-   @DataBoundConstructor
-   public SmartFrogInstance(String name, String path, String support) {
-      this.name = name;
-      this.path = path;
-      this.support = support;
-   }
+    private String name;
+    private String path;
+    private String support;
+    private String slaveSupport;
+    private String slaveLocalWorkspace;
+    private String deployScript;
+    private String runScript;
+    private String stopScript;
+    private String killScript;
+    private List<RewriteRule> rewriteRules;
 
-   public String getName() {
-      return name;
-   }
+    protected Object readResolve() {
+        if (rewriteRules == null) {
+            rewriteRules = new ArrayList<RewriteRule>();
+        }
+        return this;
+    }
 
-   public String getPath() {
-      return path;
-   }
+    @DataBoundConstructor
+    public SmartFrogInstance(String name, String path, String support, String slaveSupport,
+                             String slaveLocalWorkspace, List<RewriteRule> rewriteRules,
+                             String deployScript, String runScript, String stopScript,
+                             String killScript) {
+        this.name = name;
+        this.path = path;
+        this.support = support;
+        this.slaveSupport = slaveSupport;
+        this.slaveLocalWorkspace = slaveLocalWorkspace;
+        this.deployScript = deployScript;
+        this.runScript = runScript;
+        this.stopScript = stopScript;
+        this.killScript = killScript;
+        this.rewriteRules = rewriteRules;
+    }
 
-   /**
-    * @return path to support files needed for SmartFrog (sf, jar, sh).
-    */
-   public String getSupport() {
-      return support;
-   }
+    public String getName() {
+        return name;
+    }
 
-   public String getSupportScriptPath() {
-       return getSupport() + SUPPORT_SCRIPT;
-   }
-   
+    public String getPath() {
+        return path;
+    }
+
+    /**
+     * @return path to support files needed for SmartFrog (sf, jar, sh).
+     */
+    public String getSupport() {
+        return support;
+    }
+
+    public String getSlaveSupport() {
+        return slaveSupport;
+    }
+
+    public String getSlaveLocalWorkspace() {
+        return slaveLocalWorkspace;
+    }
+
+    public String getDeployScript() {
+        return deployScript;
+    }
+
+    public String getRunScript() {
+        return runScript;
+    }
+
+    public String getStopScript() {
+        return stopScript;
+    }
+
+    public String getKillScript() {
+        return killScript;
+    }
+
+    public List<RewriteRule> getRewriteRules() {
+        return rewriteRules;
+    }
+
+    @Extension
+    public static class DescriptorImpl extends Descriptor<SmartFrogInstance> {
+        public String getDisplayName() {
+            return "";
+        }
+    }
+
 }

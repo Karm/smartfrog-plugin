@@ -21,6 +21,7 @@
  */
 package builder.smartfrog;
 
+import builder.smartfrog.command_line.CommandLineBuilder;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -182,6 +183,10 @@ public class SmartFrogBuilder extends Builder implements SmartFrogActionListener
         return sfUserHome4;
     }
 
+    public String[] getSfUSerHomes() {
+        return new String[] { sfUserHome, sfUserHome2, sfUserHome3, sfUserHome4 };
+    }
+
     public String getSfOpts() {
         return sfOpts;
     }
@@ -223,14 +228,15 @@ public class SmartFrogBuilder extends Builder implements SmartFrogActionListener
     protected String[] buildStopDaemonCommandLine(String host) {
         return new String[] { "bash", "-xe", sfInstance.getSupport() + "/stopSF.sh", host, sfInstance.getPath(),
                 sfUserHome };
-    }*/
-    
-    //TODO move to command line builder
+    }
+
+
+    @Deprecated
     protected String[] buildKilleThemAllCommandLine(String host) {
         return new String[] { "bash", "-xe", sfInstance.getSupport() + "/killThemAll.sh", host};
     }
 
-    /*@Deprecated
+    @Deprecated
     protected String[] buildDeployCommandLine(String host, String scriptPath, String componentName, String workspace) {
         return new String[] { "bash", "-xe", sfInstance.getSupport() + "/deploySF.sh", host, sfInstance.getPath(),
                 sfUserHome, sfInstance.getSupport(), sfUserHome2, sfUserHome3, sfUserHome4, scriptPath, //sfInstance.getSupportScriptPath(),
@@ -239,7 +245,6 @@ public class SmartFrogBuilder extends Builder implements SmartFrogActionListener
 
     @Deprecated
     private String exportMatrixAxes(AbstractBuild<?, ?> build) {
-        //TODO String builder
         String exportedMatrixAxes = " ";
         MatrixConfiguration matrix = (MatrixConfiguration) build.getProject();
         Combination combinations = matrix.getCombination();
@@ -382,7 +387,9 @@ public class SmartFrogBuilder extends Builder implements SmartFrogActionListener
     
     private boolean deployTerminateHook(AbstractBuild<?, ?> build, Launcher launcher) {
         SmartFrogHost host = sfHosts.get(this.deployHost);
-        String[] deploySLCl = CommandLineBuilderFactory.getInstance(host).buildDeployCommandLine(sfInstance.getSupportScriptPath(), "terminate-hook");
+        CommandLineBuilder commandLineBuilder = CommandLineBuilderFactory.getInstance(host);
+
+        String[] deploySLCl = commandLineBuilder.buildDeployTerminateHookCommandLine();
         try {
             int status = launcher.launch().cmds(deploySLCl).envs(build.getEnvironment(console.getListener())).stdout(console.getListener()).pwd(build.getWorkspace()).join();
             if (status != 0) {
@@ -402,7 +409,9 @@ public class SmartFrogBuilder extends Builder implements SmartFrogActionListener
         String defaultScriptPath = sfScriptSource != null ? sfScriptSource.getDefaultScriptPath() : "";
         SmartFrogHost host = sfHosts.get(this.deployHost);
 
+        // TODO: REVERT THIS - hardcoded script for testing purposes
         String[] deployCl = CommandLineBuilderFactory.getInstance(host).buildDeployCommandLine(defaultScriptPath, sfScriptSource.getScriptName());
+//        String[] deployCl = CommandLineBuilderFactory.getInstance(host).buildDeployCommandLine("W:/home/hudson/script.sf", sfScriptSource.getScriptName());
         try {
             int status = launcher.launch().cmds(deployCl).envs(build.getEnvironment(console.getListener())).stdout(console.getListener()).pwd(build.getWorkspace()).join();
             if (status != 0) {
