@@ -12,10 +12,41 @@
 			<f:textbox />
 		</f:entry>
 
-		<f:entry title="Support Files" field="support"
-			description="location mounted on all nodes which contains support files (hudson-support.sf, hudson-support.jar, deploySF.sh, runSF.sh, stopSF.sh)">
-			<f:textbox />
-		</f:entry>
+        <f:entry title="Master Support Files" field="support"
+                 description="location mounted on MASTER which contains support files (hudson-support.sf, hudson-support.jar, deploySF.sh, runSF.sh, stopSF.sh)">
+            <f:textbox />
+        </f:entry>
+
+        <f:entry title="Slave Support Files" field="slaveSupport"
+                 description="location mounted on all SLAVE nodes which contains support files (hudson-support.sf, hudson-support.jar, deploySF.sh, runSF.sh, stopSF.sh)">
+            <f:textbox />
+        </f:entry>
+
+        <f:entry title="Slave local workspace" field="slaveLocalWorkspace" description="Local workspace directory to be used">
+            <f:textbox />
+        </f:entry>
+
+        <f:entry title="Run script" field="runScript" description="Script used in ssh command when starting SF daemon">
+            <f:textbox />
+        </f:entry>
+
+        <f:entry title="Stop Script" field="stopScript" description="Script used in ssh command when stopping SF daemon">
+            <f:textbox />
+        </f:entry>
+
+        <f:entry title="Deploy Script" field="deployScript" description="Script used in ssh command when deploying SF component">
+            <f:textbox />
+        </f:entry>
+
+        <f:entry title="Kill Script" field="killScript" description="Script used in cleanup ssh command">
+            <f:textbox />
+        </f:entry>
+
+        <f:entry title="Rewrite rules" field="rewriteRules" description="Rewrites applied on slave specific paths">
+            <f:repeatable field="rewriteRules">
+                <st:include page="config.jelly" class="builder.smartfrog.RewriteRule"/>
+            </f:repeatable>
+        </f:entry>
 
 		<f:entry title="">
 			<div align="right">

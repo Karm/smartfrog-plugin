@@ -15,8 +15,8 @@
             <f:textbox />
         </f:entry>
 
-        <f:entry title="JAVA_HOME" field="jdk">
-            <f:select field="jdk"/>
+        <f:entry title="JAVA_HOME" field="jdk" description="JAVA_HOME directory on this host">
+            <f:textbox />
         </f:entry>
 
         <f:entry title="">
