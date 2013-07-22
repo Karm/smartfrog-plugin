@@ -1,0 +1,22 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+    <table width="100%">
+
+        <f:entry title="Sequence" field="sequence" description="A sequence which will be replaced">
+            <f:textbox />
+        </f:entry>
+
+        <f:entry title="Replacement" field="replacement" description="Replacement text">
+            <f:textbox />
+        </f:entry>
+
+        <f:entry title="">
+            <div align="right">
+                <f:repeatableDeleteButton />
+            </div>
+        </f:entry>
+
+    </table>
+
+</j:jelly>
