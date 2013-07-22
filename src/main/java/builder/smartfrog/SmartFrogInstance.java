@@ -74,7 +74,12 @@ public class SmartFrogInstance extends AbstractDescribableImpl<SmartFrogInstance
         this.runScript = runScript;
         this.stopScript = stopScript;
         this.killScript = killScript;
-        this.rewriteRules = rewriteRules;
+
+        if (rewriteRules == null) {
+            this.rewriteRules = new ArrayList<RewriteRule>();
+        } else {
+            this.rewriteRules = rewriteRules;
+        }
     }
 
     public String getName() {
