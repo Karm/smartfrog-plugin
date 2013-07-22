@@ -1,5 +1,6 @@
 package builder.smartfrog.command_line;
 
+import hudson.FilePath;
 import hudson.model.JDK;
 import builder.smartfrog.SmartFrogBuilder;
 import builder.smartfrog.SmartFrogHost;
@@ -9,13 +10,13 @@ import builder.smartfrog.util.Functions;
 /**
  * @author jcechace
  */
-public abstract class AbstractCommandLineBuilder {
+public abstract class AbstractCommandLineBuilder implements CommandLineBuilder{
     public static final String DEF_JDK = "$JAVA_HOME";
 
     private SmartFrogBuilder builder;
     private SmartFrogInstance sfInstance;
     private SmartFrogHost host;
-    private String workspace;
+    private FilePath workspace;
 
 
 
@@ -24,7 +25,7 @@ public abstract class AbstractCommandLineBuilder {
         this.builder = host.getSfAction().getBuilder();
         this.sfInstance = this.builder.getSfInstance();
         this.host = host;
-        this.workspace = Functions.convertWsToCanonicalPath(host.getSfAction().getOwnerBuild().getWorkspace());
+        this.workspace = host.getSfAction().getOwnerBuild().getWorkspace();
 
     }
 
@@ -56,11 +57,11 @@ public abstract class AbstractCommandLineBuilder {
         this.host = host;
     }
 
-    public String getWorkspace() {
+    public FilePath getWorkspace() {
         return workspace;
     }
 
-    public void setWorkspace(String workspace) {
+    public void setWorkspace(FilePath workspace) {
         this.workspace = workspace;
     }
 
@@ -72,39 +73,82 @@ public abstract class AbstractCommandLineBuilder {
         // TODO: this can be improved by using getHost().getSfAction().getOwnerBuild().getEnvironment()
         JDK jdk = getHost().getSfAction().getOwnerBuild().getProject().getJDK();
         String path =  jdk == null ?  DEF_JDK : jdk.getHome();
-        // TODO: Hack to prevent jenkins from expanding env variables
-        path = path.replace("$", "@");
+
+        if (host.getPlatform() != SmartFrogHost.Platform.WINDOWS) {
+            // TODO: Hack to prevent jenkins from expanding env variables
+            path = path.replace("$", "@");
+        }
+
         return host.getJdk() != null ? host.getJdk() : path;
     }
 
-    public String[] buildDaemonCommandLine() {
-        // TODO: fix SfUSerHomeX
-        SmartFrogBuilder builder = getBuilder();
-        return new String[] { "bash", "-xe", getRunScript(),  getHost().getName(), getSfInstancePath(),
-                builder.getSfUserHome(), getSupportPath(), builder.getSfUserHome2(), builder.getSfUserHome3(),
-                builder.getSfUserHome4(), getWorkspacePath(), getSfOpts(), getIniPath(), exportMatrixAxes(), getJdk()};
+    public String getSfInstancePath() {
+        return getSfInstance().getPath();
+    }
+
+    public String getSupportPath() {
+        return getSfInstance().getSupport();
+    }
+
+    public String getWorkspacePath() {
+        return Functions.convertWsToCanonicalPath(workspace);
+    }
+
+    public String getSlaveWorkspacePath() {
+        if (sfInstance.getSlaveLocalWorkspace() == null || sfInstance.getSlaveLocalWorkspace() == "") {
+            return getWorkspacePath();
+        }
+        return sfInstance.getSlaveLocalWorkspace();
+    }
+
+    public String getSlaveSupportPath() {
+        return getSfInstance().getSlaveSupport();
+    }
+
+    public String getSlaveRunScript() {
+        return sfInstance.getRunScript();
+    }
+
+    public String getSlaveStopScript() {
+        return sfInstance.getStopScript();
+    }
+
+    public String getSlaveDeployScript() {
+        return sfInstance.getDeployScript();
+    }
+
+    public String getSlaveKillScript() {
+        return sfInstance.getKillScript();
     }
 
 
-    public String[] buildStopDaemonCommandLine() {
-        return new String[] { "bash", "-xe", getStopScript(), getHost().getName(), getSfInstancePath(),
-                getBuilder().getSfUserHome(), getJdk()};
+    public String getRunScript() {
+        return getSupportPath() + "/" + getPlatform() +  "/runSF.sh";
     }
 
-    public String[] buildDeployCommandLine(String scriptPath, String componentName) {
-        // TODO: fix SfUSerHomeX
-        SmartFrogBuilder builder = getBuilder();
-        return new String[] { "bash", "-xe", getDeployScript(), getHost().getName(), getSfInstancePath(),
-                builder.getSfUserHome(), getSupportPath(), builder.getSfUserHome2(), builder.getSfUserHome3(),
-                builder.getSfUserHome4(), scriptPath, componentName, getWorkspacePath(), exportMatrixAxes(), getJdk()};
+    public String getStopScript() {
+        return  getSupportPath() + "/" + getPlatform() +  "/stopSF.sh";
     }
 
-    abstract String getIniPath();
-    abstract String getSupportPath();
-    abstract String getSfInstancePath();
-    abstract String getRunScript();
-    abstract String getStopScript();
-    abstract String getDeployScript();
-    abstract String getWorkspacePath();
-    abstract String exportMatrixAxes();
+    public String getDeployScript() {
+        return getSupportPath() + "/" + getPlatform() +  "/deploySF.sh";
+    }
+
+    public String getKillScript() {
+        return getSupportPath() + "/" + getPlatform() +  "/killThemAll.sh";
+    }
+
+    protected String getPlatform() {
+        return host.getPlatform().toString().toLowerCase();
+    }
+
+    public abstract String[] buildDaemonCommandLine();
+    public abstract String[] buildStopDaemonCommandLine();
+    public abstract String[] buildDeployCommandLine(String scriptPath, String componentName);
+    public abstract String[] buildDeployTerminateHookCommandLine();
+    public abstract String[] buildKillThemAllCommandLine();
+
+    public abstract String getIniPath();
+    public abstract String exportMatrixAxes();
+    public abstract String applyRewriteRules(String path);
 }
