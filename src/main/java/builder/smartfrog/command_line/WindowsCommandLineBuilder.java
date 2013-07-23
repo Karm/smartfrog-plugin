@@ -20,32 +20,45 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
 
     @Override
     public String getIniPath() {
-        return getBuilder().isUseAltIni() ?
+        String initPath = getBuilder().isUseAltIni() ?
                 getBuilder().getSfIni() : getSfInstance().getPath() + "/bin/default.ini";
+
+        return applyRewriteRules(initPath);
     }
 
     @Override
     public String getSlaveSupportPath() {
-        return super.getSlaveSupportPath()
+        String slaveSupportPath = super.getSlaveSupportPath()
                 .replace("\\","/");
+        return applyRewriteRules(slaveSupportPath);
     }
 
     @Override
     public String getSfInstancePath() {
-        return super.getSfInstancePath()
+        String sfInstancePath = super.getSfInstancePath()
                 .replace("\\", "/");
+        return applyRewriteRules(sfInstancePath);
     }
 
     @Override
     public String getWorkspacePath() {
-        return applyRewriteRules(super.getWorkspacePath())
+        String workspacePath = applyRewriteRules(super.getWorkspacePath())
                 .replace("\\", "/");
+        return applyRewriteRules(workspacePath);
     }
 
     @Override
     public String exportMatrixAxes() {
         return "";
     }
+
+    @Override
+    public String getJdk() {
+        String jdk = super.getJdk();
+        return applyRewriteRules(jdk);
+    }
+
+
 
     @Override
     public String[] buildDaemonCommandLine() {
@@ -56,8 +69,8 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
 
     @Override
     public String[] buildDeployCommandLine(String scriptPath, String componentName) {
-        // TODO: path transformation workaround
-        if (getWorkspacePath() == getSlaveWorkspacePath()) {
+        scriptPath = applyRewriteRules(scriptPath);
+        if (getWorkspacePath().equals(getSlaveWorkspacePath())) {
             scriptPath = scriptPath.replaceFirst(super.getWorkspacePath(), getWorkspacePath());
         } else {
             scriptPath = scriptPath.replaceFirst(super.getWorkspacePath(), getSlaveWorkspacePath());
@@ -66,7 +79,7 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
         String hostName =  getHost().getName();
         return new String[] {"bash", "-xe", getDeployScript(), hostName,  getSlaveDeployScript(),
                 getSfInstancePath(), getSFClassPath(), componentName, scriptPath,
-                getWorkspacePath(), getSlaveWorkspacePath()};
+                getWorkspacePath(), getSlaveWorkspacePath(), getJdk(), getSfOpts(), getIniPath()};
     }
 
     @Override
@@ -79,13 +92,15 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
     public String[] buildStopDaemonCommandLine() {
         String hostName =  getHost().getName();
         return new String[] {"bash", "-xe", getStopScript(), hostName, getSlaveStopScript(),
-                getSfInstancePath(), getSFClassPath(), getWorkspacePath(), getSlaveWorkspacePath()};
+                getSfInstancePath(), getSFClassPath(), getWorkspacePath(), getSlaveWorkspacePath(),
+                getJdk(), getSfOpts(), getIniPath()};
     }
 
     @Override
     public  String[] buildKillThemAllCommandLine() {
         String hostName =  getHost().getName();
-        return new String[] { "bash", "-xe", getKillScript(), getSlaveKillScript(), hostName};
+        return new String[] { "bash", "-xe", getKillScript(), getSlaveKillScript(), hostName,
+                getIniPath()};
     }
 
     @Override
@@ -100,7 +115,8 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
 
     private Map<String, String> getRewriteVariableMap() {
         Map<String, String> variables = new HashMap<String, String>();
-        variables.put("{WORKSPACE}", super.getWorkspacePath());
+        String workspace = Functions.convertWsToCanonicalPath(super.getWorkspace().getParent());
+        variables.put("{WORKSPACE}", workspace);
 
         return variables;
     }
