@@ -11,8 +11,6 @@ import builder.smartfrog.util.Functions;
  * @author jcechace
  */
 public abstract class AbstractCommandLineBuilder implements CommandLineBuilder{
-    public static final String DEF_JDK = "$JAVA_HOME";
-
     private SmartFrogBuilder builder;
     private SmartFrogInstance sfInstance;
     private SmartFrogHost host;
@@ -70,16 +68,15 @@ public abstract class AbstractCommandLineBuilder implements CommandLineBuilder{
     }
 
     public String getJdk(){
-        // TODO: this can be improved by using getHost().getSfAction().getOwnerBuild().getEnvironment()
-        JDK jdk = getHost().getSfAction().getOwnerBuild().getProject().getJDK();
-        String path =  jdk == null ?  DEF_JDK : jdk.getHome();
-
-        if (host.getPlatform() != SmartFrogHost.Platform.WINDOWS) {
-            // TODO: Hack to prevent jenkins from expanding env variables
-            path = path.replace("$", "@");
+        String jdk = host.getJdk();
+        if (jdk == null || jdk.isEmpty()) {
+            if (host.getPlatform() != SmartFrogHost.Platform.WINDOWS) {
+                jdk = "@JAVA_HOME";
+            } else {
+                jdk = "";
+            }
         }
-
-        return host.getJdk() != null ? host.getJdk() : path;
+        return jdk;
     }
 
     public String getSfInstancePath() {
@@ -95,7 +92,7 @@ public abstract class AbstractCommandLineBuilder implements CommandLineBuilder{
     }
 
     public String getSlaveWorkspacePath() {
-        if (sfInstance.getSlaveLocalWorkspace() == null || sfInstance.getSlaveLocalWorkspace() == "") {
+        if (sfInstance.getSlaveLocalWorkspace() == null || sfInstance.getSlaveLocalWorkspace().isEmpty()) {
             return getWorkspacePath();
         }
         return sfInstance.getSlaveLocalWorkspace();
