@@ -64,7 +64,8 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
     public String[] buildDaemonCommandLine() {
         String hostName =  getHost().getName();
         return new String[] {"bash", "-xe", getRunScript(), hostName, getSlaveRunScript(),
-                getSfInstancePath(), getSFClassPath(), getWorkspacePath(), getSlaveWorkspacePath()};
+                getSfInstancePath(), getSFClassPath(), getWorkspacePath(), getSlaveWorkspacePath(),
+                getJdk(), getSfOpts(), getIniPath()};
     }
 
     @Override
