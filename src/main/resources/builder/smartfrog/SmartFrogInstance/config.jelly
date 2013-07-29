@@ -26,22 +26,6 @@
             <f:textbox />
         </f:entry>
 
-        <f:entry title="Run script" field="runScript" description="Script used in ssh command when starting SF daemon">
-            <f:textbox />
-        </f:entry>
-
-        <f:entry title="Stop Script" field="stopScript" description="Script used in ssh command when stopping SF daemon">
-            <f:textbox />
-        </f:entry>
-
-        <f:entry title="Deploy Script" field="deployScript" description="Script used in ssh command when deploying SF component">
-            <f:textbox />
-        </f:entry>
-
-        <f:entry title="Kill Script" field="killScript" description="Script used in cleanup ssh command">
-            <f:textbox />
-        </f:entry>
-
         <f:entry title="Rewrite rules" field="rewriteRules" description="Rewrites applied on slave specific paths">
             <f:repeatable field="rewriteRules">
                 <st:include page="config.jelly" class="builder.smartfrog.RewriteRule"/>

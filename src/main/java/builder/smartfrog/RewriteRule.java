@@ -4,6 +4,7 @@ package builder.smartfrog;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
+import hudson.util.ListBoxModel;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.Map;
@@ -14,11 +15,24 @@ import java.util.Map;
 public class RewriteRule extends AbstractDescribableImpl<RewriteRule> {
     private String sequence;
     private String replacement;
+    private Classification classification;
+
+    public static enum Classification{
+        COMMON,
+        LINUX,
+        WINDOWS;
+
+        @Override
+        public String toString() {
+            return super.toString();
+        }
+    }
 
     @DataBoundConstructor
-    public RewriteRule(String sequence, String replacement) {
+    public RewriteRule(String sequence, String replacement,Classification classification) {
         this.sequence = sequence;
         this.replacement = replacement;
+        this.classification = classification;
     }
 
     public String apply(String path) {
@@ -49,10 +63,22 @@ public class RewriteRule extends AbstractDescribableImpl<RewriteRule> {
         return replacement;
     }
 
+    public Classification getClassification() {
+        return classification;
+    }
+
     @Extension
     public static class DescriptorImpl extends Descriptor<RewriteRule> {
         public String getDisplayName() {
             return "";
+        }
+
+        public ListBoxModel doFillClassificationItems(){
+            ListBoxModel lb = new ListBoxModel();
+            for (Classification c : Classification.values()){
+                lb.add(c.toString(), c.toString());
+            }
+            return lb;
         }
     }
 

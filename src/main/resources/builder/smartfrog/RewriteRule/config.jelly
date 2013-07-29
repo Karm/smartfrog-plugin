@@ -2,6 +2,9 @@
          xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
     <table width="100%">
+        <f:entry title="Classification" field="classification">
+            <f:select />
+        </f:entry>
 
         <f:entry title="Sequence" field="sequence" description="A sequence which will be replaced">
             <f:textbox />
