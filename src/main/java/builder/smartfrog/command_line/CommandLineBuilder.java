@@ -8,5 +8,5 @@ public interface CommandLineBuilder {
     String[] buildStopDaemonCommandLine();
     String[] buildDeployCommandLine(String scriptPath, String componentName);
     String[] buildDeployTerminateHookCommandLine();
-    String[] buildKillThemAllCommandLine();
+    String[] buildClearSlaveCommandLine();
 }

@@ -18,33 +18,12 @@ public class LinuxCommandLineBuilder extends AbstractCommandLineBuilder {
     public LinuxCommandLineBuilder(SmartFrogHost host) {
         super(host);
     }
-    public  LinuxCommandLineBuilder(){
-
-    }
 
     @Override
     public String  getIniPath() {
-        return getBuilder().isUseAltIni() ? getBuilder().getSfIni() : getSfInstance().getPath() + "/bin/default.ini";
-    }
-
-    @Override
-    public String getSlaveWorkspacePath() {
-        return getWorkspacePath();
-    }
-
-    @Override
-    public String getRunScript() {
-        return getSupportPath() + "/runSF.sh";
-    }
-
-    @Override
-    public String getStopScript() {
-        return  getSupportPath() + "/stopSF.sh";
-    }
-
-    @Override
-    public String getDeployScript() {
-        return getSupportPath() + "/deploySF.sh";
+        String initPath = getBuilder().isUseAltIni() ?
+                getBuilder().getSfIni() : getSfInstance().getPath() + "/bin/default.ini";
+        return initPath;
     }
 
     @Override
@@ -68,26 +47,32 @@ public class LinuxCommandLineBuilder extends AbstractCommandLineBuilder {
 
     @Override
     public String[] buildDaemonCommandLine() {
-        // TODO: fix SfUSerHomeX
-        SmartFrogBuilder builder = getBuilder();
-        return new String[] { "bash", "-xe", getRunScript(),  getHost().getName(), getSfInstancePath(),
-                builder.getSfUserHome(), getSupportPath(), builder.getSfUserHome2(), builder.getSfUserHome3(),
-                builder.getSfUserHome4(), getWorkspacePath(), getSfOpts(), getIniPath(), exportMatrixAxes(), getJdk()};
-    }
-
-    @Override
-    public String[] buildStopDaemonCommandLine() {
-        return new String[] { "bash", "-xe", getStopScript(), getHost().getName(), getSfInstancePath(),
-                getBuilder().getSfUserHome(), getJdk()};
+        String hostName =  getHost().getName();
+        return new String[] {"bash", "-xe", getRunScript(), hostName, getSlaveRunScript(),
+                getSfInstancePath(), getSFClassPath(), getWorkspacePath(), getSlaveWorkspacePath(),
+                getJdk(), getSfOpts(), getIniPath()};
     }
 
     @Override
     public String[] buildDeployCommandLine(String scriptPath, String componentName) {
-        // TODO: fix SfUSerHomeX
-        SmartFrogBuilder builder = getBuilder();
-        return new String[] { "bash", "-xe", getDeployScript(), getHost().getName(), getSfInstancePath(),
-                builder.getSfUserHome(), getSupportPath(), builder.getSfUserHome2(), builder.getSfUserHome3(),
-                builder.getSfUserHome4(), scriptPath, componentName, getWorkspacePath(), exportMatrixAxes(), getJdk()};
+        if (getWorkspacePath().equals(getSlaveWorkspacePath())) {
+            scriptPath = scriptPath.replaceFirst(super.getWorkspacePath(), getWorkspacePath());
+        } else {
+            scriptPath = scriptPath.replaceFirst(super.getWorkspacePath(), getSlaveWorkspacePath());
+        }
+
+        String hostName =  getHost().getName();
+        return new String[] {"bash", "-xe", getDeployScript(), hostName,  getSlaveDeployScript(),
+                getSfInstancePath(), getSFClassPath(), componentName, scriptPath,
+                getWorkspacePath(), getSlaveWorkspacePath(), getJdk()};
+    }
+
+    @Override
+    public String[] buildStopDaemonCommandLine() {
+        String hostName =  getHost().getName();
+        return new String[] {"bash", "-xe", getStopScript(), hostName, getSlaveStopScript(),
+                getSfInstancePath(), getSFClassPath(), getWorkspacePath(), getSlaveWorkspacePath(),
+                getJdk()};
     }
 
     @Override
@@ -96,13 +81,27 @@ public class LinuxCommandLineBuilder extends AbstractCommandLineBuilder {
         return  buildDeployCommandLine(path, "terminate-hook");
     }
 
-    public  String[] buildKillThemAllCommandLine() {
+    @Override
+    public  String[] buildClearSlaveCommandLine() {
         String hostName =  getHost().getName();
-        return new String[] { "bash", "-xe", getKillScript(), hostName};
+        return new String[] { "bash", "-xe", getKillScript(), getSlaveKillScript(), hostName};
     }
 
     @Override
     public String applyRewriteRules(String path) {
         throw new UnsupportedOperationException("Rewrite rules are not supported yet for Linux commandline builder");
     }
+
+    public String  getSFClassPath() {
+        String supportPath = getSlaveSupportPath() + "/*:";
+        StringBuilder sfPath = new StringBuilder(supportPath);
+        String[] userHomes = getBuilder().getSfUSerHomes();
+        for (String home : userHomes) {
+            if (!home.isEmpty()){
+                sfPath.append(home + "/*").append(":");
+            }
+        }
+        return sfPath.toString();
+    }
 }
+

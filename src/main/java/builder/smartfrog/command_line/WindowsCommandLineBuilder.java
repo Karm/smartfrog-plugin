@@ -5,6 +5,7 @@ import builder.smartfrog.SmartFrogHost;
 import builder.smartfrog.SmartFrogInstance;
 import builder.smartfrog.util.Functions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,8 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
         return applyRewriteRules(workspacePath);
     }
 
+
+
     @Override
     public String exportMatrixAxes() {
         return "";
@@ -65,7 +68,7 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
         String hostName =  getHost().getName();
         return new String[] {"bash", "-xe", getRunScript(), hostName, getSlaveRunScript(),
                 getSfInstancePath(), getSFClassPath(), getWorkspacePath(), getSlaveWorkspacePath(),
-                getJdk(), getSfOpts(), getIniPath()};
+                getJdk()};
     }
 
     @Override
@@ -80,7 +83,7 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
         String hostName =  getHost().getName();
         return new String[] {"bash", "-xe", getDeployScript(), hostName,  getSlaveDeployScript(),
                 getSfInstancePath(), getSFClassPath(), componentName, scriptPath,
-                getWorkspacePath(), getSlaveWorkspacePath(), getJdk(), getSfOpts(), getIniPath()};
+                getWorkspacePath(), getSlaveWorkspacePath(), getJdk()};
     }
 
     @Override
@@ -94,32 +97,22 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
         String hostName =  getHost().getName();
         return new String[] {"bash", "-xe", getStopScript(), hostName, getSlaveStopScript(),
                 getSfInstancePath(), getSFClassPath(), getWorkspacePath(), getSlaveWorkspacePath(),
-                getJdk(), getSfOpts(), getIniPath()};
+                getJdk()};
     }
 
     @Override
-    public  String[] buildKillThemAllCommandLine() {
+    public  String[] buildClearSlaveCommandLine() {
         String hostName =  getHost().getName();
-        return new String[] { "bash", "-xe", getKillScript(), getSlaveKillScript(), hostName,
-                getIniPath()};
+        return new String[] { "bash", "-xe", getKillScript(), getSlaveKillScript(), hostName };
     }
 
     @Override
     public String applyRewriteRules(String path) {
-        List<RewriteRule> rewriteRules = getSfInstance().getRewriteRules();
-        for (RewriteRule rule : rewriteRules) {
-                path = rule.apply(path, getRewriteVariableMap());
-        }
-        return path;
-    }
-
-
-    private Map<String, String> getRewriteVariableMap() {
-        Map<String, String> variables = new HashMap<String, String>();
-        String workspace = Functions.convertWsToCanonicalPath(super.getWorkspace().getParent());
-        variables.put("{WORKSPACE}", workspace);
-
-        return variables;
+        List<RewriteRule.Classification> classifications =
+                new ArrayList<RewriteRule.Classification>();
+        classifications.add(RewriteRule.Classification.COMMON);
+        classifications.add(RewriteRule.Classification.WINDOWS);
+        return super.applyRewriteRules(path, classifications);
     }
 
 

@@ -1,11 +1,16 @@
 package builder.smartfrog.command_line;
 
+import builder.smartfrog.RewriteRule;
 import hudson.FilePath;
 import hudson.model.JDK;
 import builder.smartfrog.SmartFrogBuilder;
 import builder.smartfrog.SmartFrogHost;
 import builder.smartfrog.SmartFrogInstance;
 import builder.smartfrog.util.Functions;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author jcechace
@@ -99,25 +104,32 @@ public abstract class AbstractCommandLineBuilder implements CommandLineBuilder{
     }
 
     public String getSlaveSupportPath() {
-        return getSfInstance().getSlaveSupport();
+        String  slaveSupportPath = getSfInstance().getSlaveSupport();
+        if (slaveSupportPath == null || slaveSupportPath.isEmpty()) {
+            slaveSupportPath = getSupportPath();
+        }
+        return slaveSupportPath;
     }
 
     public String getSlaveRunScript() {
-        return sfInstance.getRunScript();
+        return getSlaveSupportPath() + "/" + getPlatform() +
+                "/runSFSlave." + getPlatform().extension;
     }
 
     public String getSlaveStopScript() {
-        return sfInstance.getStopScript();
+        return getSlaveSupportPath() + "/" + getPlatform() +
+                "/stopSFSlave." + getPlatform().extension;
     }
 
     public String getSlaveDeployScript() {
-        return sfInstance.getDeployScript();
+        return getSlaveSupportPath() + "/" + getPlatform() +
+                "/deploySFSlave." + getPlatform().extension;
     }
 
     public String getSlaveKillScript() {
-        return sfInstance.getKillScript();
+        return getSlaveSupportPath() + "/" + getPlatform() +
+                "/clearSFSlave." + getPlatform().extension;
     }
-
 
     public String getRunScript() {
         return getSupportPath() + "/" + getPlatform() +  "/runSF.sh";
@@ -135,16 +147,33 @@ public abstract class AbstractCommandLineBuilder implements CommandLineBuilder{
         return getSupportPath() + "/" + getPlatform() +  "/killThemAll.sh";
     }
 
-    protected String getPlatform() {
-        return host.getPlatform().toString().toLowerCase();
+    protected SmartFrogHost.Platform getPlatform() {
+        return host.getPlatform();
+    }
+
+    public String applyRewriteRules(String path, List<RewriteRule.Classification> classifications) {
+        List<RewriteRule> rewriteRules = getSfInstance().getRewriteRules();
+        for (RewriteRule rule : rewriteRules) {
+            if (classifications.contains(rule.getClassification())){
+                path = rule.apply(path, getRewriteVariableMap());
+            }
+        }
+        return path;
+    }
+
+    protected Map<String, String> getRewriteVariableMap() {
+        Map<String, String> variables = new HashMap<String, String>();
+        String workspace = Functions.convertWsToCanonicalPath(this.workspace.getParent());
+        variables.put("{WORKSPACE}", workspace);
+        return variables;
     }
 
     public abstract String[] buildDaemonCommandLine();
     public abstract String[] buildStopDaemonCommandLine();
     public abstract String[] buildDeployCommandLine(String scriptPath, String componentName);
     public abstract String[] buildDeployTerminateHookCommandLine();
-    public abstract String[] buildKillThemAllCommandLine();
-
+    public abstract String[] buildClearSlaveCommandLine();
+    public abstract String getSFClassPath();
     public abstract String getIniPath();
     public abstract String exportMatrixAxes();
     public abstract String applyRewriteRules(String path);
