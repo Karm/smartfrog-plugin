@@ -111,9 +111,20 @@ public class SmartFrogHost extends AbstractDescribableImpl<SmartFrogHost> {
     * Supported platforms
     */
     public static enum Platform {
-        LINUX,
-        WINDOWS,
-        SOLARIS,
+        LINUX("sh"),
+        WINDOWS("bat"),
+        SOLARIS("sh");
+
+        public final String extension;
+
+        private Platform(String extension) {
+            this.extension = extension;
+        }
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
     }
 
     @Extension

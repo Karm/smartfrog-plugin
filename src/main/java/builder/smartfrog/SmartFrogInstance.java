@@ -47,10 +47,6 @@ public class SmartFrogInstance extends AbstractDescribableImpl<SmartFrogInstance
     private String support;
     private String slaveSupport;
     private String slaveLocalWorkspace;
-    private String deployScript;
-    private String runScript;
-    private String stopScript;
-    private String killScript;
     private List<RewriteRule> rewriteRules;
 
     protected Object readResolve() {
@@ -62,18 +58,12 @@ public class SmartFrogInstance extends AbstractDescribableImpl<SmartFrogInstance
 
     @DataBoundConstructor
     public SmartFrogInstance(String name, String path, String support, String slaveSupport,
-                             String slaveLocalWorkspace, List<RewriteRule> rewriteRules,
-                             String deployScript, String runScript, String stopScript,
-                             String killScript) {
+                             String slaveLocalWorkspace, List<RewriteRule> rewriteRules) {
         this.name = name;
         this.path = path;
         this.support = support;
         this.slaveSupport = slaveSupport;
         this.slaveLocalWorkspace = slaveLocalWorkspace;
-        this.deployScript = deployScript;
-        this.runScript = runScript;
-        this.stopScript = stopScript;
-        this.killScript = killScript;
 
         if (rewriteRules == null) {
             this.rewriteRules = new ArrayList<RewriteRule>();
@@ -103,22 +93,6 @@ public class SmartFrogInstance extends AbstractDescribableImpl<SmartFrogInstance
 
     public String getSlaveLocalWorkspace() {
         return slaveLocalWorkspace;
-    }
-
-    public String getDeployScript() {
-        return deployScript;
-    }
-
-    public String getRunScript() {
-        return runScript;
-    }
-
-    public String getStopScript() {
-        return stopScript;
-    }
-
-    public String getKillScript() {
-        return killScript;
     }
 
     public List<RewriteRule> getRewriteRules() {

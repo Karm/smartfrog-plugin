@@ -180,7 +180,7 @@ public class SmartFrogAction implements Action, Runnable {
             if(exitCode != 0) { 
                 // something went wrong, let's try hard kill, also with timeout as whole machine can be unresponsive
                 // TODO replace with something more sophisticated/universal than bash script
-                String[] cmd = commandLineBuilder.buildKillThemAllCommandLine();
+                String[] cmd = commandLineBuilder.buildClearSlaveCommandLine();
                 Proc killThemAll = launcher.launch().cmds(cmd).envs(build.getEnvironment(log)).pwd(build.getWorkspace()).stdout(log).start();
                 // still can take some time if e.g. server is under heavy load due to deadlock or something like this, so let wait few minutes too
                 exitCode = killProc.joinWithTimeout(3, TimeUnit.MINUTES, console.getListener());
