@@ -1,0 +1,1 @@
+ps -u hudson -o pid,args | grep -v -e .*slave.jar$ | grep -o -E ^[0-9,' '][0-9]+ | xargs kill -9
