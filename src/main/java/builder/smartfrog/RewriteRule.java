@@ -48,7 +48,7 @@ public class RewriteRule extends AbstractDescribableImpl<RewriteRule> {
     }
 
     private String _apply(String sequence, String replacement, String path) {
-        if (!path.contains(sequence)) {
+        if (!path.startsWith(sequence)) {
             return path;
         }
         return path.replaceFirst(sequence, replacement);
