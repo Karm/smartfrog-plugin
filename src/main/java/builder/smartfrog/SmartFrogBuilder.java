@@ -151,6 +151,10 @@ public class SmartFrogBuilder extends Builder implements SmartFrogActionListener
                 this.sfHosts.put(h.getName(), h);
             }
         }
+
+        if(builderId == null) 
+            builderId = "";
+
         return this;
     }
     
