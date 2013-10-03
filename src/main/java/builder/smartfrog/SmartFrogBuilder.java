@@ -233,7 +233,7 @@ public class SmartFrogBuilder extends Builder implements SmartFrogActionListener
 
     @Deprecated
     protected String[] buildKilleThemAllCommandLine(String host) {
-        return new String[] { "bash", "-xe", sfInstance.getSupport() + "/killThemAll.sh", host};
+        return new String[] { "bash", "-xe", sfInstance.getSupport() + "/clearSF.sh", host};
     }
 
     @Deprecated

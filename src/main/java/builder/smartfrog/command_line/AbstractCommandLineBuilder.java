@@ -73,15 +73,7 @@ public abstract class AbstractCommandLineBuilder implements CommandLineBuilder{
     }
 
     public String getJdk(){
-        String jdk = host.getJdk();
-        if (jdk == null || jdk.isEmpty()) {
-            if (host.getPlatform() != SmartFrogHost.Platform.WINDOWS) {
-                jdk = "@JAVA_HOME";
-            } else {
-                jdk = "";
-            }
-        }
-        return jdk;
+        return host.getJdk() == null ? "" : host.getJdk();
     }
 
     public String getSfInstancePath() {
@@ -97,7 +89,8 @@ public abstract class AbstractCommandLineBuilder implements CommandLineBuilder{
     }
 
     public String getSlaveWorkspacePath() {
-        if (sfInstance.getSlaveLocalWorkspace() == null || sfInstance.getSlaveLocalWorkspace().isEmpty()) {
+        if (sfInstance.getSlaveLocalWorkspace() == null ||
+                sfInstance.getSlaveLocalWorkspace().isEmpty()) {
             return getWorkspacePath();
         }
         return sfInstance.getSlaveLocalWorkspace();
@@ -144,7 +137,7 @@ public abstract class AbstractCommandLineBuilder implements CommandLineBuilder{
     }
 
     public String getKillScript() {
-        return getSupportPath() + "/" + getPlatform() +  "/killThemAll.sh";
+        return getSupportPath() + "/" + getPlatform() +  "/clearSF.sh";
     }
 
     protected SmartFrogHost.Platform getPlatform() {
