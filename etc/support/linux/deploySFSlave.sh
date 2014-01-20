@@ -10,7 +10,7 @@
 
 source ~/.bash_profile;
 
-export =$2;
+export SFHOME=$2;
 export SFUSERCLASSPATH=$3;
 
 if [ $8 ]; then

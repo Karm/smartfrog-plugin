@@ -12,10 +12,18 @@
 
     <artifactId>smartfrog-plugin</artifactId>
     <packaging>hpi</packaging>
-    <version>2.2.4-SNAPSHOT</version>
+    <version>2.2.6.karm-SNAPSHOT</version>
     <name>SmartFrog Builder</name>
 
     <developers>
+        <developer>
+            <id>jcechace</id>
+            <name>Jakub Cechacek</name>
+        </developer>
+       <developer>
+            <id>mbabacek</id>
+            <name>Michal Babacek</name>
+        </developer>
         <developer>
             <id>vjuranek</id>
             <name>Vojtech Juranek</name>
@@ -24,6 +32,7 @@
             <id>rhusar</id>
             <name>Radoslav Husar</name>
         </developer>
+
     </developers>
 
     <scm>
