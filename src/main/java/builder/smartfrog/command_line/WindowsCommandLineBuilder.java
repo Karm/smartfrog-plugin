@@ -64,8 +64,18 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
   }
 
   @Override
+  public String getStopScript() {
+    return applyRewriteRules(super.getStopScript()).replace("\\", "/");
+  }
+
+  @Override
   public String getKillScript() {
     return applyRewriteRules(super.getKillScript()).replace("\\", "/");
+  }
+
+  @Override
+  public String getDeployScript() {
+    return applyRewriteRules(super.getDeployScript()).replace("\\", "/");
   }
 
   @Override
@@ -89,9 +99,9 @@ public class WindowsCommandLineBuilder extends AbstractCommandLineBuilder implem
   public String[] buildDeployCommandLine(String scriptPath, String componentName) {
     scriptPath = applyRewriteRules(scriptPath);
     if (getWorkspacePath().equals(getSlaveWorkspacePath())) {
-      scriptPath = scriptPath.replaceFirst(super.getWorkspacePath(), getWorkspacePath());
+      //scriptPath = scriptPath.replaceFirst(super.getWorkspacePath(), getWorkspacePath());
     } else {
-      scriptPath = scriptPath.replaceFirst(super.getWorkspacePath(), getSlaveWorkspacePath());
+      scriptPath = scriptPath.replaceFirst(getWorkspacePath(), getSlaveWorkspacePath());
     }
 
     String hostName = getHost().getName();
