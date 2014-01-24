@@ -8,4 +8,4 @@
 # $6 - Local Workspace
 # $7 - JAVA_HOME
 
-ssh -x hudson@$1  $2  $1 $3 "\"$4\"" "\"$5\"" "\"$6\"" "\"$7\"";
+ssh -x MSDOMAIN_hudson@$1  $2  $1 $3 "\"$4\"" "\"$5\"" "\"$6\"" "\"$7\"";
